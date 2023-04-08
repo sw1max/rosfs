@@ -1,5 +1,5 @@
-#![no_std] // don't link the Rust standard library
-#![no_main] // disable all Rust-level entry points
+#![no_std]
+#![no_main]
 #![feature(custom_test_frameworks)]
 #![test_runner(osrs::test_runner)]
 #![reexport_test_harness_main = "test_main"]
@@ -7,24 +7,17 @@
 use core::panic::PanicInfo;
 use osrs::println;
 
-#[no_mangle] // don't mangle the name of this function
+#[no_mangle]
 pub extern "C" fn _start() -> ! {
     println!("Hello World{}", "!");
 
     osrs::init();
 
-    fn stack_overflow() {
-        stack_overflow(); // for each recursion, the return address is pushed
-    }
-
-    // trigger a stack overflow
-    stack_overflow();
-
     #[cfg(test)]
     test_main();
 
     println!("It did not crash!");
-    loop {}
+    osrs::hlt_loop();
 }
 
 /// This function is called on panic.
@@ -32,11 +25,16 @@ pub extern "C" fn _start() -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    osrs::hlt_loop();
 }
 
 #[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     osrs::test_panic_handler(info)
+}
+
+#[test_case]
+fn trivial_assertion() {
+    assert_eq!(1, 1);
 }

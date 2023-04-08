@@ -17,13 +17,13 @@ pub extern "C" fn _start() -> ! {
     // trigger a stack overflow
     stack_overflow();
 
-    panic!("Execution continue after stack overflow");
+    panic!("Execution continued after stack overflow");
 }
 
 #[allow(unconditional_recursion)]
 fn stack_overflow() {
     stack_overflow(); // for each recursion, the return address is pushed
-    volatile::Volatile::new(0).read(); // prevent tail recursion optimixations
+    volatile::Volatile::new(0).read(); // prevent tail recursion optimizations
 }
 
 lazy_static! {
@@ -34,6 +34,7 @@ lazy_static! {
                 .set_handler_fn(test_double_fault_handler)
                 .set_stack_index(osrs::gdt::DOUBLE_FAULT_IST_INDEX);
         }
+
         idt
     };
 }
